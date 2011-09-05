@@ -30,7 +30,8 @@ object GitJiraCLI {
       case Right(config) =>
         val action = config.actions match {
           case List("branch", jiraNumber) => new BranchAction(jiraNumber toInt)
-          case List("resolve") => new ResolveAction()
+          case List("resolve") => new ResolveAction(0)
+          case List("resolve", jiraNumber) => new ResolveAction(jiraNumber toInt)
           case List("assigned") => new AssignedAction()
           case List("describe", jiraNumber) => new DescribeAction(jiraNumber toInt)
           case _ =>

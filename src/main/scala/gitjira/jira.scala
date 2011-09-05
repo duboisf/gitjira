@@ -20,6 +20,8 @@ object JIRA {
 case class JiraIssue(key: String, number: Int, summary: String, description: String) {
 
   val id = "%s-%s" format (key, number)
+
+  def downloadFrom(jira: JIRA) = jira getIssue number
 }
 
 object JiraIssue {

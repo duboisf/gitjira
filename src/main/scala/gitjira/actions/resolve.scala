@@ -1,14 +1,30 @@
 package gitjira.actions
 
-import gitjira.{JiraIssue, Git, Configuration, JIRA}
+import gitjira._
 
-case class ResolveAction() extends GitJiraAction {
+case class ResolveAction(number: Int) extends GitJiraAction {
 
   def execute(config: Configuration, jira: JIRA) {
 
+    // need JIRA config in Git, make sure it's there
+    JIRA.project required "JIRA project must be configured"
+
     val me = System getProperty "user.name"
+
+    // JIRA issue number is in the name of the branch (allow override in command line arguments)
     val branch = Git.branch.get
-    val issue = JiraIssue(branch takeWhile (_ != '/'))
+    val ExpectedBranchSyntax = """(\w+-\d+)/(.*)""".r
+    val issueId = if ( number > 0 ) JIRA.shortname + "-" + number
+    else branch match {
+      case ExpectedBranchSyntax(id,summary) => id
+      case _ => {
+          println("Invalid branch syntax '%s', expecting TEST-123/blabla" format branch)
+          throw new IllegalArgumentException("cannot determine JIRA issue to resolve")
+      }
+    }
+
+    // Download the full issue details from JIRA
+    val issue = JiraIssue(issueId) downloadFrom jira
 
     config log ("JIRA Resolve: %s" format issue)
 
