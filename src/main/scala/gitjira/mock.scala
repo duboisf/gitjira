@@ -7,14 +7,9 @@ class DummyJira extends JIRA {
   def getAssignedIssues = Seq(JiraIssue("TEST", 123), JiraIssue("TEST", 456))
 }
 
-trait DummyJiraProvider extends JiraProvider {
-
-  override val jira = new DummyJira
+trait DummyJiraProvider {
+  val jira = new DummyJira
 }
 
-object MockMain extends App with DummyJiraProvider {
-
-  val (config, action) = GitJiraCLI parse args
-
-  action execute(config, jira)
+object MockMain extends GitJiraMain with DummyJiraProvider {
 }

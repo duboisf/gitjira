@@ -2,21 +2,39 @@ package gitjira
 
 import sys.process._
 
-object Git {
+class GitConfig(key: String, default: Option[String]) {
 
-  def config(key: String, default: String = null): Option[String] = {
+  lazy val value = try {
+    ("git config --get " + key).!! trim match {
+      case "" => None
+      case s => Some(s)
+    }
+  } catch {
+    case _ => default
+  }
 
-    try {
-      // if this returns a non-zero exit code, it throws an exception
-      ("git config --get " + key).!! trim match {
-        case "" => None
-        case s => Some(s)
-      }
-    } catch {
-      // any exception running the command, assume the config value is absent and return None
-      case _ => None
+  def required(msg: String) {
+    if ( ! value.isDefined ) {
+      val error = """
+Git config '%s' is missing: %s
+Define by running:
+  git config --local %s <VALUE>
+""" format (key,msg,key)
+
+      println(error)
+      throw new RuntimeException(error)
     }
   }
+
+  override def toString = value get
+}
+
+object GitConfig {
+  def apply(key: String) = new GitConfig(key, None)
+  def apply(key: String, default: GitConfig) = new GitConfig(key, default.value)
+}
+
+object Git {
 
   def createBranch(branch: String) {
 
@@ -38,13 +56,23 @@ object Git {
 
   def deleteBranch(branch: String) = ("git branch -d %s" format branch).!
 
-  def merge (branch: String) { ("git merge --ff --stat %s" format branch).! }
+  def merge(branch: String) {
+    ("git merge --ff --stat %s" format branch).!
+  }
 
-  def rebase (branch: String) { ("git rebase --stat %s" format branch).! }
+  def rebase(branch: String) {
+    ("git rebase --stat %s" format branch).!
+  }
 
-  def pull(remote: String, branch: String) { ("git pull --ff --stat --rebase %s %s" format (remote, branch)).! }
+  def pull(remote: String, branch: String) {
+    ("git pull --ff --stat --rebase %s %s" format(remote, branch)).!
+  }
 
-  def push(remote: String, branch: String) { ("git push %s %s" format (remote, branch)).! }
+  def push(remote: String, branch: String) {
+    ("git push %s %s" format(remote, branch)).!
+  }
 
-  def note(userid: String, jira: String) { ("git notes --ref=jira-%s add -f -m 'fixes:%s'" format (userid, jira)).! }
+  def note(userid: String, jira: String) {
+    ("git notes --ref=jira-%s add -f -m 'fixes:%s'" format(userid, jira)).!
+  }
 }

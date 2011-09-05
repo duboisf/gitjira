@@ -7,10 +7,14 @@ case class BranchAction(number: Int) extends GitJiraAction {
 
   def execute(config: Configuration, jira: JIRA) {
 
-    val issue = jira getIssue number
-    val branchName = "%s-%s/%s" format(JIRA.shortname.get, number, issue summary)
+    // need JIRA config in Git
+    JIRA.project required "JIRA project must be configured"
 
-    config log ("Branching for JIRA %s: %s" format (issue.id, branchName))
+    val issue = jira getIssue number
+    config log ("Got JIRA: %s" format issue)
+
+    val branchName = "%s-%s/%s" format(JIRA.shortname, number, issue summary)
+    config log ("Branching for JIRA %s: %s" format (issue id, branchName))
 
     jira transition (issue, IN_PROGRESS)
 

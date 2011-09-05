@@ -3,11 +3,8 @@ package gitjira
 abstract class JIRA {
 
   def getIssue(number: Int): JiraIssue
-
   def transition(issue: JiraIssue, resolution: String)
-
   def resolve(issue: JiraIssue)
-
   def getAssignedIssues: Seq[JiraIssue]
 }
 
@@ -15,9 +12,9 @@ object JIRA {
   val IN_PROGRESS = "IN_PROGRESS" // TODO make this an enum or something
 
   // load certain configuration options from the Git config
-  val project = (Git config "jira.project")
-  val instance = (Git config "jira.instance")
-  val shortname = (Git config "jira.shortname")
+  lazy val project = GitConfig("jira.project")
+  lazy val instance = GitConfig("jira.instance")
+  lazy val shortname = GitConfig("jira.shortname", project)
 }
 
 case class JiraIssue(key: String, number: Int, summary: String, description: String) {
@@ -33,9 +30,4 @@ object JiraIssue {
   }
 
   def apply(key: String, number: Int) = new JiraIssue(key, number, key + "-" + number, null)
-}
-
-trait JiraProvider {
-
-  val jira: JIRA
 }
