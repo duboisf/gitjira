@@ -2,6 +2,10 @@ package gitjira.actions
 
 import gitjira._
 
+object ResolveAction {
+  def apply() = new ResolveAction(0)
+}
+
 case class ResolveAction(number: Int) extends GitJiraAction {
 
   def execute(config: Configuration, jira: JIRA) {
@@ -17,10 +21,7 @@ case class ResolveAction(number: Int) extends GitJiraAction {
     val issueId = if ( number > 0 ) JIRA.shortname + "-" + number
     else branch match {
       case ExpectedBranchSyntax(id,summary) => id
-      case _ => {
-          println("Invalid branch syntax '%s', expecting TEST-123/blabla" format branch)
-          throw new IllegalArgumentException("cannot determine JIRA issue to resolve")
-      }
+      case _ => sys.error("Invalid branch syntax '%s', expecting TEST-123/blabla" format branch)
     }
 
     // Download the full issue details from JIRA

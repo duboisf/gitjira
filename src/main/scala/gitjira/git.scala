@@ -16,13 +16,12 @@ class GitConfig(key: String, default: Option[String]) {
   def required(msg: String) {
     if ( ! value.isDefined ) {
       val error = """
-Git config '%s' is missing: %s
-Define by running:
-  git config --local %s <VALUE>
-""" format (key,msg,key)
+        |Git config '%s' is missing: %s
+        |Define by running:
+        |   git config --local %s <VALUE>
+        |""".stripMargin format (key,msg,key)
 
-      println(error)
-      throw new RuntimeException(error)
+      sys.error(error)
     }
   }
 

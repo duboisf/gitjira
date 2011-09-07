@@ -8,10 +8,11 @@ case class DescribeAction(number: Int) extends GitJiraAction {
 
     val issue = jira getIssue number
     val output = """Issue: %s
-Assigned: %s
-Summary: %s
-Description: %s
-"""
+      |Assigned: %s
+      |Summary: %s
+      |Description: %s
+      |""".stripMargin
+
     println(output format (issue.id, "TODO", issue.summary, issue.description))
   }
 }

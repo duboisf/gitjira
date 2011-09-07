@@ -2,10 +2,11 @@ package gitjira
 
 abstract class JIRA {
 
-  def getIssue(number: Int): JiraIssue
-  def transition(issue: JiraIssue, resolution: String)
-  def resolve(issue: JiraIssue)
+  def getIssue (number: Int): JiraIssue
+  def transition (issue: JiraIssue, resolution: String)
+  def resolve (issue: JiraIssue)
   def getAssignedIssues: Seq[JiraIssue]
+  def logWorkDone (issue: JiraIssue, workDone: String)
 }
 
 object JIRA {
